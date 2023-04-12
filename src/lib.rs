@@ -47,6 +47,8 @@ pub mod STYLE {
 
 mod types {
 
+	// TODO: impl std::fmt::Display for FileName<&str> {}
+	// #[derive(Display)]
 	pub enum FileName<T> {
 		Regular(T),
 		Executable(T),
@@ -59,14 +61,18 @@ mod types {
 	// TODO: for composing FileName<&str> to a PathName
 
 	impl FileName<&str> {
-		fn to_str(self) -> &str {
+		fn to_str(self) -> &'static str {
 			use FileName::*;
+			use super::STYLE::*;
+			use super::RESET::ALL as RESET;
 			// let mut result: &str;
-			if let Regular(result) = self {};
-			if let Executable(result) = self {};
-			if let Directory(result) = self {};
-			if let Symlink(result) = self {};
-			if let Pathname(result) = self {};
+			let result = &*match self {
+				Regular(inner) => FILE.to_string() + inner + RESET,
+				Executable(inner) => EXEC.to_string() + inner + RESET,
+				Directory(inner) => DIR.to_string() + inner + RESET,
+				Symlink(inner) => SYMLINK.to_string() + inner + RESET,
+				Pathname(inner) => inner.to_string(),
+			};
 			result
 		}
 	}
@@ -118,23 +124,23 @@ mod types {
 
 	// TODO: fix the impl below
 	// TODO: check that only the last FileName is NOT a FileName::Directory
-	impl ToPathName for FileName<&str> {
-		fn to_pathname(&self) -> self::FileName<&str> {
-			let mut inner: String = (&self).to_str().to_string();
-			for i in [ 1 ..= inner.len() - 1 ] {
-				inner.push(&self[i]);
-			}
-			let result = FileName::Path(&*inner);
-			result
-		}
-	}
+	// impl ToPathName for FileName<&str> {
+	// 	fn to_pathname(&self) -> FileName<&str> {
+	// 		let mut inner: String = (&self).to_str().to_string();
+	// 		for i in [ 1 ..= inner.len() - 1 ] {
+	// 			inner.push(self[i]);
+	// 		}
+	// 		let result = FileName::Pathname(&*inner);
+	// 		result
+	// 	}
+	// }
 
 	pub struct LogEntry<'a> {
-		text: &'a str,
-		direct: FileName<&'a str>,
-		infix: &'a str,
-		indirect: FileName<&'a str>,
-		postfix: &'a str,
+		pub text: &'a str,
+		pub direct: FileName<&'a str>,
+		pub infix: &'a str,
+		pub indirect: FileName<&'a str>,
+		pub postfix: &'a str,
 	}
 
 	pub enum LogType<'a> {
@@ -149,7 +155,7 @@ mod types {
 	}
 
 	impl LogEntry<'_> {
-		fn new() -> LogEntry<'_> {
+		fn new() -> LogEntry<'static> {
 			let mut result = LogEntry {
 				text: "",
 				direct: FileName::Pathname(""),
@@ -173,34 +179,49 @@ pub mod log {
 		use super::COLOR::{RED, PURPLE};
 		use super::STYLE::BOLD;
 		use super::RESET::ALL as RESET;
-		use super::RESET::COLOR;
+		// use super::RESET::COLOR;
 		use super::types::LogType;
 
 	trait Loggable {
 		fn log(self);
 	}
 
-	impl Loggable for LogType<'_> {
+	impl Loggable for LogType<'static> {
 		fn log(self) {
 			use LogType::*;
+			use super::types::LogEntry;
+			use super::RESET::COLOR;
+			let mut inner: LogEntry;
+
 			println!( "{}{}{}: {}{}{}{}{}",
 				TAB, BOLD,
-				match self {
-					Header(LogEntry)	=> BLUE		.to_string() + "[#]",
-					Info(LogEntry)		=> CYAN		.to_string() + "[*]",
-					Hint(LogEntry)		=> DARKGREEN.to_string() + "[+]",
-					Message(LogEntry)	=> GREEN	.to_string() + "[>]",
-					Action(LogEntry)	=> YELLOW	.to_string() + "[@]",
-					Warning(LogEntry)	=> ORANGE	.to_string() + "[!]",
-					Error(LogEntry)		=> RED		.to_string() + "[!]",
-					Prompt(LogEntry)	=> PURPLE	.to_string() + "[?]",
-					_					=> COLOR	.to_string() + "[_]",
-				} + RESET,
-				self.text,
-				self.direct,
-				self.infix,
-				self.indirect,
-				self.postfix,
+				if let Header(inner)	= self { BLUE		.to_string() + "[#]" } else
+				if let Info(inner)	 	= self { CYAN		.to_string() + "[*]" } else
+				if let Hint(inner)	 	= self { DARKGREEN	.to_string() + "[+]" } else
+				if let Message(inner)	= self { GREEN		.to_string() + "[>]" } else
+				if let Action(inner)	= self { YELLOW		.to_string() + "[@]" } else
+				if let Warning(inner)	= self { ORANGE		.to_string() + "[!]" } else
+				if let Error(inner)		= self { RED		.to_string() + "[!]" } else
+				if let Prompt(inner)	= self { PURPLE		.to_string() + "[?]" } else
+				{ let inner = {}; COLOR.to_string() + "[_]" } + RESET,
+
+				// FIXME: For some reason, a match expression won't work
+				// FIXME: it refuses to bind the value in the enum to inner
+				// if let prefix = match self {
+				// 	Header(inner)	=> BLUE		.to_string() + "[#]",
+				// 	Info(inner)		=> CYAN		.to_string() + "[*]",
+				// 	Hint(inner)		=> DARKGREEN.to_string() + "[+]",
+				// 	Message(inner)	=> GREEN	.to_string() + "[>]",
+				// 	Action(inner)	=> YELLOW	.to_string() + "[@]",
+				// 	Warning(inner)	=> ORANGE	.to_string() + "[!]",
+				// 	Error(inner)	=> RED		.to_string() + "[!]",
+				// 	Prompt(inner)	=> PURPLE	.to_string() + "[?]",
+				// } + RESET { prefix } else { let inner = COLOR.to_string() + "[_]" + RESET; inner },
+				inner.text,
+				inner.direct,
+				inner.infix,
+				inner.indirect,
+				inner.postfix,
 			)
 		}
 	}
@@ -267,6 +288,7 @@ pub mod log {
 
 #[test]
 fn check_dirname() {
+	// use types::FileName;
 	println!("Tests:\n{} {}\n{} {}\n",
 		"dir", "dir".to_directory(),
 		"dir/", "dir/".to_directory(),
