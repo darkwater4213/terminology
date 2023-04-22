@@ -56,7 +56,7 @@ pub(crate) mod STYLE {
 
 mod types {
 
-	// TODO: finish the impl below
+	// HACK: finish the impl below
 	// impl std::fmt::Display for FileName<&str> {
 	// 	fn fmt(&self, _: &mut Formatter) -> Result<(), std::fmt::Error> { todo!() }
 	// }
@@ -139,7 +139,7 @@ mod types {
 	// 	fn to_pathname(&self) -> FileName<String> {
 	// 		let mut inner: String = (&self).to_string().to_string();
 	// 		for i in [ 1 ..= inner.len() - 1 ] {
-	// 			inner.push(self[i]);
+	// 			inner.push(self.i);
 	// 		}
 	// 		let result = FileName::Pathname(inner);
 	// 		result
