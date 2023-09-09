@@ -1,4 +1,5 @@
 // use super::TAB;
+use std::fmt::Display;
 use super::BRIGHT::{BLUE, GREEN, YELLOW, CYAN};
 use super::COLOR::YELLOW as ORANGE;
 use super::COLOR::GREEN as DARKGREEN;
@@ -8,11 +9,11 @@ use super::RESET::ALL as RESET;
 use super::types::LogType;
 
 trait Loggable {
-	fn log(self);
+	fn fmt(self);
 }
 
-impl Loggable for LogType {
-	fn log(self) {
+impl Display for LogType {
+	fn fmt(self) {
 		use LogType::*;
 		// use super::types::LogEntry;
 		// use super::RESET::COLOR;

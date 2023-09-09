@@ -54,5 +54,46 @@ pub(crate) mod STYLE {
 	pub(crate) static UL: &str		= "\u{1b}[4m";
 }
 
-pub(crate) mod types;
-pub mod log;
+// pub(crate) mod types;
+// pub mod log;
+
+// enum Effect {
+//     Bold,
+//     Dim,
+//     Italic,
+//     Underline,
+//     Blink,
+// }
+
+// enum Reset {
+//     All,
+//     Color,
+//     Bold,
+//     Dim,
+//     Italic,
+//     Underline,
+//     Blink,
+// }
+
+// enum Hue {
+//     Black,
+//     Red,
+//     Green,
+//     Yellow,
+//     Blue,
+//     Purple,
+//     Cyan,
+//     White,
+// }
+
+// struct Color {
+//     bright: bool,
+//     hue: Hue,
+// }
+
+// struct Style {
+//     color: Color,
+//     style: Effect,
+// }
+
+
